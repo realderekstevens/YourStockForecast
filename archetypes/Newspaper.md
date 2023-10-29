@@ -1,0 +1,25 @@
++++
+title = 'April 12th, 1861'
+date = 2023-10-28T16:33:45-07:00
+draft = false
+tags = ['1861', 'April', 'Civil War']
++++
+{{< embed-pdf url="/1861-04-12-p1.pdf" >}}
+
+Here is some content. This is all in Markdown.
+
+- List Item
+- asdfasdfasd
+- asdfasdfas
+
+Dictionary
+: Dictionary definitions
+
+1. asdf
+2. asdf
+
+{{< embed-pdf url="/1861-04-12-p2.pdf" >}}
+
+{{< embed-pdf url="/1861-04-12-p3.pdf" >}}
+
+{{< embed-pdf url="/1861-04-12-p4.pdf" >}}
