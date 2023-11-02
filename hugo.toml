@@ -26,7 +26,7 @@ enableGitInfo = true
   contentDir = 'content.en'
   weight = 1
 
-[languages.ru]
+[languages.es]
   languageName = 'Spanish'
   contentDir = 'content.es'
   weight = 2
@@ -94,7 +94,7 @@ enableGitInfo = true
   # (Optional, default true) Enables search function with flexsearch,
   # Index is built on fly, therefore it might slowdown your website.
   # Configuration for indexing can be adjusted in i18n folder per language.
-  BookSearch = true
+  BookSearch = false
 
   # (Optional, default true) Enables comments template on pages
   # By default partals/docs/comments.html includes Disqus template
@@ -106,11 +106,11 @@ enableGitInfo = true
   # (Optional, experimental, default false) Enables portable links and link checks in markdown pages.
   # Portable links meant to work with text editors and let you write markdown without {{< relref >}} shortcode
   # Theme will print warning if page referenced in markdown does not exists.
-  BookPortableLinks = true
+  BookPortableLinks = false
 
   # /!\ This is an experimental feature, might be removed or changed at any time
   # (Optional, experimental, default false) Enables service worker that caches visited pages and resources for offline use.
-  BookServiceWorker = true
+  BookServiceWorker = false
 
   # /!\ This is an experimental feature, might be removed or changed at any time
   # (Optional, experimental, default false) Enables a drop-down menu for translations only if a translation is present.

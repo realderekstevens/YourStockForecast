@@ -3,6 +3,8 @@ title: Introduction
 type: docs
 ---
 
+<center>{{< time >}}</center>
+
 # Acerbo datus maxime
 
 {{< columns >}}
