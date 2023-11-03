@@ -23,3 +23,7 @@ This site is compiled and organized with Hugo, using [this very simple theme](ht
 - Model submission files after [example.md](example.md). Put them in the 'content/' folder.
 - File names should be the date of the citation in the format of YYYY/MM/DD.
 - Article must be a direct citation.
+
+## Current Goals
+
+Right now there is a strong drive to work on articles and stats relating to the American Great Depression and convert that over to multiple different languages.
