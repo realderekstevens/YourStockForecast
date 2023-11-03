@@ -1,4 +1,4 @@
-# YourStockForecast Website
+# Your Stock Forecast Website
 
 [http://yourstockforecast.com](http://yourstockforecast.com)
 

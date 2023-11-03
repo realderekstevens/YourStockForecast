@@ -1,0 +1,232 @@
+{{/*
+Set up the CVS file and and open it.
+*/}}
+{{- $csvfile := .Get "src" -}}
+{{- if fileExists $csvfile -}}
+{{- $seperator := "," -}}
+{{- $data := getCSV $seperator $csvfile -}}
+
+{{/*
+Get the date that we want and set it to the same format as the CSV file so we can find that group of records.
+*/}}
+{{- $Thedate := .Get "Day" -}}
+{{- $Previousdate := $Thedate -}}
+{{- $Nextdate := $Thedate -}}
+{{- $Thedate := dateFormat "1-2-2006" ($Thedate) -}}
+
+{{/*
+Set up the variables for the columns of the fields that we want to use.
+*/}}
+{{- $FeelsLike := 3 -}}
+{{- $DewPoint := 4 -}}
+{{- $Temperature := 2 -}}
+{{- $Humidity := 16 -}}
+{{- $UVRadiation := 17 -}}
+{{- $SolarRadiation := 18 -}}
+{{- $StrikesPerDay := 19 -}}
+{{- $StrikesPerHour := 20 -}}
+{{- $Wind := 6 -}}
+{{- $WindGust := 7 -}}
+{{- $Pressure := 15 -}}
+{{- $WindDirection := 8 -}}
+{{- $DailyRain := 10 -}}
+{{- $MaxHourly := 9 -}}
+{{- $EventRain := 14 -}}
+{{- $WeeklyRain := 11 -}}
+{{- $MonthlyRain := 12 -}}
+{{- $YearlyRain := 13 -}}
+
+{{/*
+Find the row number for the date that we want to pull the rocrods from.
+*/}}
+ {{- range $index, $col := getCSV $seperator $csvfile -}}
+ {{- if (ne $index 0 ) -}}
+ {{- if and ( eq ($Thedate) ( dateFormat "1-2-2006" (index $col 1) )) ( eq (index $col 0) "Average") -}}
+
+{{/*
+This is the line number of the first group of lines that we want. We can set up the rest from here.
+*/}}
+{{- $average := $index -}}
+{{- $high := add $index 1 -}}
+{{- $hightime := add $index 2 -}}
+{{- $low := add $index 3 -}}
+{{- $lowtime := add $index 4 -}}
+{{- $YesterdaysHigh := add $high 5 -}}
+{{- $YesterdaysLow:= add $low 5 -}}
+
+{{/*
+Set up all of the values I want to get as variables. This will make it easier to clean up and rearrange the tables if I want to in the future.
+*/}}
+{{- $AverageTemperature := float (index $data $average $Temperature ) -}}
+{{- $HighTemperature := float ( index $data $high $Temperature ) -}}
+{{- $HighTemperatureTime := index $data $hightime $Temperature -}}
+{{- $LowTempterature := float (index $data $low $Temperature ) -}}
+{{- $LowTemperatureTime := index $data $lowtime $Temperature -}}
+{{- $HighTemperatureFromYesterday := float ( index $data $YesterdaysHigh $Temperature) -}}
+{{- $LowTempteratureFromYesterday := float ( index $data $YesterdaysLow $Temperature) -}}
+{{- $TempteratureRange := sub $HighTemperature $LowTempterature | lang.FormatNumber 1 -}}
+{{- $AverageFeelsLike := float (index $data $average $FeelsLike ) -}}
+{{- $HighFeelsLike := float ( index $data $high $FeelsLike) -}}
+{{- $HighFeelsLikeTime := index $data $hightime $FeelsLike -}}
+{{- $LowFeelsLike := float (index $data $low $FeelsLike) -}}
+{{- $LowFeelsLikeTime := index $data $lowtime $FeelsLike -}}
+{{- $FeelsLikeRange := sub $HighFeelsLike $LowFeelsLike | lang.FormatNumber 1 -}}
+{{- $HighFeelsLikeFromYesterday := float ( index $data $YesterdaysHigh $FeelsLike) -}}
+{{- $LowFeelsLikeFromYesterday := float ( index $data $YesterdaysLow $FeelsLike) -}}
+{{- $AverageDewPoint := float (index $data $average $DewPoint) -}}
+{{- $HighDewPoint := float ( index $data $high $DewPoint) -}}
+{{- $HighDewPointTime := index $data $hightime $DewPoint -}}
+{{- $LowDewPoint := float (index $data $low $DewPoint) -}}
+{{- $LowewPointTime:= index $data $lowtime $DewPoint -}}
+{{- $DewPointRange := sub $HighDewPoint $LowDewPoint | lang.FormatNumber 1 -}}
+{{- $HighDewPointFromYesterday := float ( index $data $YesterdaysHigh $DewPoint) -}}
+{{- $LowDewPointFromYesterday := float ( index $data $YesterdaysLow $DewPoint) -}}
+{{- $AverageHumidity := float (index $data $average $Humidity ) -}}
+{{- $HighHumidity := int (index $data $high $Humidity ) -}}
+{{- $HighHumidityTime := index $data $hightime $Humidity -}}
+{{- $LowHumidity := int (index $data $low $Humidity ) -}}
+{{- $LowHumidityTime := index $data $hightime $Humidity -}}
+{{- $HumidityRange := sub $HighHumidity $LowHumidity -}}
+{{- $AveragePressure := float (index $data $average $Pressure ) -}}
+{{- $HighPressure := float ( index $data $high $Pressure ) -}}
+{{- $HighPressureTime := index $data $hightime $Pressure -}}
+{{- $LowPressure := float (index $data $low $Pressure) -}}
+{{- $LowPressureTime := index $data $lowtime $Pressure -}}
+{{- $PressureRange := sub $HighPressure $LowPressure | lang.FormatNumber 2 -}}
+{{- $UVRadiationTime := index $data $hightime $UVRadiation -}}
+{{- $UVRadiationHigh := index $data $high $UVRadiation -}}
+{{- $SolarRadiationTime := index $data $hightime $SolarRadiation -}}
+{{- $SolarRadiationHigh := index $data $high $SolarRadiation -}}
+{{- $HighStrikesPerHour := index $data $high $StrikesPerHour -}}
+{{- $HighStrikesPerHourTime := index $data $hightime $StrikesPerHour -}}
+{{- $HighStrikesPerDay := index $data $high $StrikesPerDay -}}
+{{- $HighDailyRain := index $data $high $DailyRain -}}
+{{- $HighMaxHourlyRain := index $data $high $MaxHourly -}}
+{{- $HighEventRain := index $data $high $EventRain -}}
+{{- $HighYesterdaysRain := index $data $YesterdaysHigh $DailyRain -}}
+{{- $HighWeeklyRain := index $data $high $WeeklyRain -}}
+{{- $HighMonthlyRain := index $data $high $MonthlyRain -}}
+{{- $HighYearlyRain := index $data $high $YearlyRain -}}
+{{- $AverageWind :=index $data $average $Wind -}}
+{{- $HighWind := index $data $high $Wind -}}
+{{- $HighWindTime := index $data $hightime $Wind -}}
+{{- $AverageGust:= index $data $average $WindGust -}}
+{{- $HighGust := index $data $high $WindGust -}}
+{{- $HighGustTime := index $data $hightime $WindGust -}}
+{{- $AverageWindDirection := index $data $average $WindDirection -}}
+{{/* Set up Variables for differences */}}
+{{- $HighTemperatureDifference := sub $HighTemperature $HighTemperatureFromYesterday | lang.FormatNumber 1 -}}
+{{- $LowTemperatureDifference := sub $LowTempterature $LowTempteratureFromYesterday | lang.FormatNumber 1 -}}
+{{- $HighDewPointDifference := sub $HighDewPoint $HighDewPointFromYesterday| lang.FormatNumber 1 -}}
+{{- $HighFeelsLikeDifference := sub $HighFeelsLike $HighFeelsLikeFromYesterday | lang.FormatNumber 1 -}}
+{{- $LowDewPointDifference := sub $LowDewPoint $LowDewPointFromYesterday| lang.FormatNumber 1 -}}
+{{- $LowFeelsLikeDifference := sub $LowFeelsLike $LowFeelsLikeFromYesterday | lang.FormatNumber 1 -}}
+
+{{/*
+We'll start with a table for the temperature fields
+*/}}
+<table> <caption>Temperature </caption><thead><tr>
+<th></th><th>Temperature</th><th>Time</th><th>Dew Point</th><th>Time</th> <th>Feels Like</th><th>Time</th> </tr></thead><tbody>
+<tr><td>Average</td><td>{{- $AverageTemperature }} &#8457; </td><td></td><td>{{- $AverageDewPoint }} &#8457; </td><td></td><td>{{- $AverageFeelsLike }} &#8457; </td><td></td></tr>
+<tr><td>Today's High</td><td>{{- $HighTemperature }} &#8457; </td><td><time datetime="{{ $HighTemperatureTime }}"> {{- $HighTemperatureTime | time.Format ":time_short" -}}</time></td><td>{{- $HighDewPoint }} &#8457;</td><td><time datetime="{{ $HighDewPointTime}}"> {{- $HighDewPointTime | time.Format ":time_short" -}}</time></td><td>{{- $HighFeelsLike }} &#8457; </td><td><time datetime="{{ $HighFeelsLikeTime }}"> {{- $HighFeelsLikeTime | time.Format ":time_short" -}}</time></td></tr>
+<tr><td>Today's Low</td><td>{{- $LowTempterature }} &#8457; </td><td><time datetime="{{ $LowTemperatureTime }}"> {{- $LowTemperatureTime | time.Format ":time_short" -}}</time></td><td>{{- $LowDewPoint }} &#8457; </td><td><time datetime="{{ $LowDewPointTime }}"> {{- $LowDewPointTime | time.Format ":time_short" -}}</time></td><td>{{- $LowFeelsLike }} &#8457; </td><td><time datetime="{{ $LowFeelsLikeTime }}"> {{- $LowFeelsLikeTime | time.Format ":time_short" -}}</time></td></tr>
+<tr><td>Range</td><td>{{ $TempteratureRange }} &#8457; </td><td></td><td>{{- $DewPointRange }} &#8457; </td><td></td><td>{{- $FeelsLikeRange }} &#8457; </td><td></td></tr>
+<tr><td>Yesterday's High</td><td>{{- $HighTemperatureFromYesterday }} &#8457; </td><td></td><td>{{- $HighDewPointFromYesterday }} &#8457;</td><td></td><td>{{- $HighFeelsLikeFromYesterday }} &#8457; </td><td></td></tr>
+<tr><td>Yesterday's Low</td><td>{{- $LowTempteratureFromYesterday }} &#8457; </td><td></td><td>{{- $LowDewPointFromYesterday }} &#8457;</td><td></td><td>{{- $LowFeelsLikeFromYesterday }} &#8457; </td><td></td></tr>
+<tr><td>High Difference</td><td>{{- $HighTemperatureDifference }} &#8457; </td><td></td><td>{{- $HighDewPointDifference }} &#8457;</td><td></td><td>{{- $HighFeelsLikeDifference }} &#8457; </td><td></td></tr>
+<tr><td>Low Difference</td><td>{{- $LowTemperatureDifference }} &#8457; </td><td></td><td>{{- $LowDewPointDifference }} &#8457;</td><td></td><td>{{- $LowFeelsLikeDifference }} &#8457; </td><td></td></tr>
+</tbody>
+</table>
+
+{{/*
+Next we'll generate the table for the humidity values.
+*/}}
+<table> <caption>Humidity</caption> <thead><tr>
+<th></th><th>Humidity</th><th>Time</th> </tr> </thead>
+<tbody>
+<tr><td>Average</td><td>{{- $AverageHumidity -}} %</td><td></td></tr>
+<tr><td>High</td><td>{{- $HighHumidity -}} %</td><td><time datetime="{{ $HighHumidityTime }}"> {{- $HighHumidityTime | time.Format ":time_short" -}}</time>
+</td></tr>
+<tr><td>Low</td><td>{{- $LowHumidity -}} %</td><td><time datetime="{{ $LowHumidityTime }}"> {{- $LowHumidityTime | time.Format ":time_short" -}}</time>
+</td></tr>
+<tr><td>Range</td><td>{{- $HumidityRange -}} %</td><td></td></tr></tbody>
+</table>
+
+{{/*
+Now we'll to a table with the barometer information..
+*/}}
+<table> <caption>Releative Pressure</caption> <thead><tr>
+<th></th><th>Pressure</th><th>Time</th> </tr> </thead>
+<tbody>
+<tr><td>Average</td><td>{{ $AveragePressure -}} &#8243;</td><td></td></tr>
+<tr><td>High</td><td>{{ $HighPressure -}} &#8243;</td><td><time datetime="{{ $HighPressureTime }}"> {{- $HighPressureTime | time.Format ":time_short" -}}</time></td></tr>
+<tr><td>Low</td><td>{{ $LowPressure -}} &#8243;</td><td><time datetime="{{ $LowPressureTime }}"> {{- $LowPressureTime | time.Format ":time_short" -}}</time> </td></tr>
+<tr><td>Range</td><td>{{ $PressureRange -}} &#8243;</td><td></td></tr></tbody>
+</table>
+
+{{/*
+Next we will do a table for UV and solar radation.
+*/}}
+<table>
+<caption>Sun</caption><thead><tr>
+<th><th>Max</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td>UV Radiation</td><td>{{ $UVRadiationHigh }}</td><td><time datetime="{{ $UVRadiationTime }}">{{- $UVRadiationTime | time.Format ":time_short" -}}</time></td></tr>
+<tr><td>Solar Radiation</td><td>{{ $SolarRadiationHigh }} W/m&#178;</td><td><time datetime="{{ $SolarRadiationTime }}"> {{- $SolarRadiationTime | time.Format ":time_short" -}}</time> </td></tr>
+</tbody>
+</table>
+
+{{/*
+Next we'll set up a table for the wind values.
+*/}}
+<table>
+<thead><tr><th></th><th>Wind</th><th>Gust</th><th>Time</th></tr></thead><tbody>
+<tr><td>Wind</td><td>{{ $AverageWind }} mph</td><td>{{ $HighWind }} mph<td><time datetime="{{ $HighWindTime }}"> {{- $HighWindTime | time.Format ":time_short" -}}</time>
+</td></tr>
+<tr><td>Gust</td><td>{{ $AverageGust }} mph</td><td>{{ $HighGust }} mph<td><time datetime="{{ $HighGustTime }}"> {{- $HighGustTime | time.Format ":time_short" -}}</time></tr>
+<tr><td>Direction</td><td>{{- $AverageWindDirection -}} </td><td></td><td></td></tr></tbody></table>
+
+{{/*
+Next we'll generate the table with the rainfall values.
+*/}}
+<table> <caption> Rainfall</caption> <thead><tr>
+<th>Daily Rain</th> <th>Max Hourly</th><th>Event Rain</th><th>Yesterday's Rain</th><th>Weekly Rain</th><th>Monthly Rain</th><th>Yearly Rain</th></tr></thead><tbody>
+<tr><td>{{ $HighDailyRain -}} &#8243;</td><td>{{ $HighMaxHourlyRain -}} &#8243; per hour</td><td>{{ $HighEventRain }} in</td><td>{{ $HighYesterdaysRain -}} &#8243;</td><td>{{ $HighWeeklyRain -}} &#8243;</td><td>{{ $HighMonthlyRain -}} &#8243;</td><td>{{ $HighYearlyRain -}} &#8243;</td></tr></tbody>
+</table>
+
+{{/*
+Last we will generate the table for the lightning sensor data but only if there were strikes on
+this day.
+*/}}
+{{- if ne "0" $HighStrikesPerDay -}}
+<table>
+<caption>Lightning</caption><thead><tr>
+<th><th>Max</th><th>Time</th></tr></thead>
+<tbody>
+<tr><td>Strikes Per Hour</td><td>{{ $HighStrikesPerHour }}</td><td>{{- if ( $HighStrikesPerHour) }} <time datetime="{{ $HighStrikesPerHourTime }}"> {{- $HighStrikesPerHourTime | time.Format ":time_short" -}}</time> {{- end -}}</td></tr>
+<tr><td>Strikes Per Day</td><td>{{ $HighStrikesPerDay }} </td><td></td></tr>
+</tbody>
+</table>
+{{- end -}}
+{{- break -}}
+{{- end -}}
+{{- else -}}
+{{- continue -}}
+{{- end -}}
+{{- end -}}
+{{- $PreviousYear := (time $Previousdate).AddDate 0 0 -1 | dateFormat "2006" -}}
+{{- $PreviousYearMonthDay := (time $Previousdate).AddDate 0 0 -1 | dateFormat "01-02-2006" -}}
+{{- $NextYear := (time $Previousdate).AddDate 0 0 1 | dateFormat "2006" -}}
+{{- $NextYearMonthDay := (time $Previousdate).AddDate 0 0 1 | dateFormat "01-02-2006" -}}
+{{- $Nextdate := (time $Nextdate).AddDate 0 0 -1 | dateFormat "01-02-2006" -}}
+{{- $PreviousFile := printf "%s" "wx/history/" | printf "%s%s" $PreviousYear | printf "%s%s%s" $PreviousYearMonthDay "/"| printf "%s%s" ".md" -}}
+{{- $PreviousFile := printf "%s%s%s%s%s" "/wx/history/" $PreviousYear "/" $PreviousYearMonthDay ".md" -}}
+{{- $PreviousURL := printf "%s%s%s%s%s" "/wx/history/" $PreviousYear "/" $PreviousYearMonthDay "/" -}}
+{{- $NextFile := printf "%s%s%s%s%s" "wx/history/" $NextYear "/" $NextYearMonthDay ".md" -}}
+{{- $NextURL := printf "%s%s%s%s%s" "wx/history/" $NextYear "/" $NextYearMonthDay "/" -}}
+<div class="wx-footer"><p>
+{{- if os.FileExists $PreviousFile -}} <a href="{{- $PreviousURL | absURL -}}" title="Previous Day">Previous Day</a> {{- end -}}
+{{- if os.FileExists $NextFile -}} <a href ="{{- $NextURL | absURL -}}" title="Next Day">Next Day</a> {{- end -}}</div></p>
+{{- else -}}
+CSV file Missing
+{{- end -}}
