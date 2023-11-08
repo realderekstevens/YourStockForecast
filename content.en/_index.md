@@ -7,6 +7,8 @@ type: docs
 
 [http://yourstockforecast.com](http://yourstockforecast.com)
 
+The world's largest private collection of stock market data.
+
 This is a simple stock market data & newspaper archive where users can submit data here for credit.
 There are no ads, trackers or cookies.
 

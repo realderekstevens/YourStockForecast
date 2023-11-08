@@ -4,6 +4,9 @@ title = 'Your Stock Forecast'
 theme = 'hugo-book'
 pluralizelisttitles = 'false'
 
+googleAnalytics = "G-9DDL9X80G8"
+disqusShortname = "yourstockforecast"
+
 # Book configuration
 disablePathToLower = true
 enableGitInfo = true
@@ -51,7 +54,7 @@ enableGitInfo = true
   # (Optional, default true) Controls table of contents visibility on right side of pages.
   # Start and end levels can be controlled with markup.tableOfContents setting.
   # You can also specify this parameter per page in front matter.
-  BookToC = true
+  BookToC = false
 
   # (Optional, default favicon.png) Set the path to a favicon file.
   # If the favicon is /static/favicon.png then the path would be favicon.png
@@ -84,7 +87,7 @@ enableGitInfo = true
   # Enable "Edit this page" links for 'doc' page type.
   # Disabled by default. Uncomment to enable. Requires 'BookRepo' param.
   # Edit path must point to root directory of repo.
-  # BookEditPath = ' '
+  #BookEditPath = ' '
 
   # Configure the date format used on the pages
   # - In git information
@@ -94,7 +97,7 @@ enableGitInfo = true
   # (Optional, default true) Enables search function with flexsearch,
   # Index is built on fly, therefore it might slowdown your website.
   # Configuration for indexing can be adjusted in i18n folder per language.
-  BookSearch = false
+  BookSearch = true
 
   # (Optional, default true) Enables comments template on pages
   # By default partals/docs/comments.html includes Disqus template
