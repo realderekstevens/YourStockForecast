@@ -1,10 +1,10 @@
 +++
-title       = "The New York Times"
+title       = "New York Times"
 date        = 1929-10-01T00:00:00-06:00
 draft       = false
 layout      = "newspaper"
 weight      = 1
-publication = "The New York Times"
+publication = "New York Times"
 volume      = "78"
 issue       = "26183"
 location    = "New York, NY"

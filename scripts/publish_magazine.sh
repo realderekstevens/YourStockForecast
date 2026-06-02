@@ -4,7 +4,7 @@
 #
 # All-in-one pipeline for adding a new magazine issue to YourStockForecast:
 #   1. Splits a source PDF into single-page PDFs
-#   2. Creates Hugo content folders (1/, 2/, 3/ …)
+#   2. Creates Hugo content folders (2/, 3/, 4/ … skipping 1 = cover/index)
 #   3. Writes a weighted _index.md in each page folder
 #   4. Writes a section-level _index.md in the publication folder
 #
@@ -15,10 +15,10 @@
 #   bash publish_magazine.sh /path/to/1929-10-28-time.pdf
 #   bash publish_magazine.sh /path/to/1929-10-28-time.pdf 36
 #
-# The script infers DATE and PUBLICATION from the source PDF filename.
 # Filename must follow the pattern:  YYYY-MM-DD-<publication>.pdf
 #   e.g.  1931-03-16-time.pdf
 #         1929-10-28-nyt.pdf
+#         1929-10-03-los-angeles-times.pdf
 # =============================================================================
 
 set -euo pipefail
@@ -30,31 +30,36 @@ CONTENT_BASE="${HUGO_ROOT}/content.en"
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── PUBLICATION CONFIG TABLE ─────────────────────────────────────────────────
-# Map lowercased publication slug → display name, location, layout
 pub_display_name() {
     case "$1" in
-        time)   echo "Time" ;;
-        nyt)    echo "The New York Times" ;;
-        *)      echo "$1" ;;   # fallback: use slug as-is
+        time)               echo "Time" ;;
+        nyt)                echo "The New York Times" ;;
+        los-angeles-times)  echo "Los Angeles Times" ;;
+        *)                  echo "$1" ;;
     esac
 }
+
 pub_location() {
     case "$1" in
-        time)   echo "New York, N.Y." ;;
-        nyt)    echo "New York, N.Y." ;;
-        *)      echo "New York, N.Y." ;;
+        time)               echo "New York, NY" ;;
+        nyt)                echo "New York, NY" ;;
+        los-angeles-times)  echo "Los Angeles, CA" ;;
+        *)                  echo "New York, NY" ;;
     esac
 }
+
 pub_layout() {
-    # All issues share the same Hugo layout for now
     echo "newspaper"
 }
+
 pub_content_dir_name() {
-    # The folder name used under content.en/YYYY/MM/DD/
     case "$1" in
-        time)   echo "Time" ;;
-        nyt)    echo "New-York-Times" ;;
-        *)      echo "$1" ;;
+        time)               echo "Time" ;;
+        nyt)                echo "New-York-Times" ;;
+        los-angeles-times)  echo "Los-Angeles-Times" ;;
+        *)                  # Title-case the slug, replacing hyphens with spaces then back
+            echo "$1" | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1' | sed 's/ /-/g'
+            ;;
     esac
 }
 # ─────────────────────────────────────────────────────────────────────────────
@@ -76,9 +81,9 @@ if [[ ! -f "$SOURCE_PDF" ]]; then
 fi
 
 # Derive DATE and PUB_SLUG from filename  e.g. 1929-10-28-time.pdf
-BASENAME=$(basename "$SOURCE_PDF" .pdf)          # 1929-10-28-time
-DATE=$(echo "$BASENAME" | grep -oP '^\d{4}-\d{2}-\d{2}')   # 1929-10-28
-PUB_SLUG=$(echo "$BASENAME" | sed "s/^${DATE}-//")          # time
+BASENAME=$(basename "$SOURCE_PDF" .pdf)
+DATE=$(echo "$BASENAME" | grep -oP '^\d{4}-\d{2}-\d{2}')
+PUB_SLUG=$(echo "$BASENAME" | sed "s/^${DATE}-//")
 
 YEAR=$(echo "$DATE"  | cut -d- -f1)
 MONTH=$(echo "$DATE" | cut -d- -f2)
@@ -96,6 +101,7 @@ CONTENT_DIR="${CONTENT_BASE}/${YEAR}/${MONTH}/${DAY}/${CONTENT_DIR_NAME}"
 echo "============================================================"
 echo "  Source PDF   : ${SOURCE_PDF}"
 echo "  Publication  : ${PUBLICATION}"
+echo "  Location     : ${LOCATION}"
 echo "  Date         : ${DATE}"
 echo "  PDF prefix   : ${PDF_PREFIX}"
 echo "  Content dir  : ${CONTENT_DIR}"
@@ -109,7 +115,7 @@ mkdir -p "$PDF_STATIC_DIR"
 
 python3 - <<PYEOF
 from pypdf import PdfReader, PdfWriter
-import os, sys
+import os
 
 src     = "${SOURCE_PDF}"
 out_dir = "${PDF_STATIC_DIR}"
@@ -147,7 +153,6 @@ echo "[ 2/3 ] Writing section _index.md for ${PUBLICATION}..."
 
 mkdir -p "$CONTENT_DIR"
 
-# Human-readable date title e.g. "October 28, 1929"
 TITLE_DATE=$(date -d "${DATE}" "+%B %-d, %Y")
 
 cat > "${CONTENT_DIR}/_index.md" <<EOF
@@ -164,11 +169,11 @@ EOF
 
 echo "        wrote ${CONTENT_DIR}/_index.md"
 
-# ── STEP 3: PER-PAGE _index.md FILES ────────────────────────────────────────
+# ── STEP 3: PER-PAGE _index.md FILES (pages 2+ — page 1 is the cover/index) ─
 echo ""
-echo "[ 3/3 ] Creating ${NUM_PAGES} page folders with _index.md..."
+echo "[ 3/3 ] Creating $((NUM_PAGES - 1)) page folders (skipping page 1 = cover)..."
 
-for (( i=1; i<=NUM_PAGES; i++ )); do
+for (( i=2; i<=NUM_PAGES; i++ )); do
     PAGE_DIR="${CONTENT_DIR}/${i}"
     mkdir -p "$PAGE_DIR"
 
@@ -195,6 +200,6 @@ done
 echo ""
 echo "============================================================"
 echo "  All done!"
-echo "  ${NUM_PAGES} pages published under:"
+echo "  Pages 2–${NUM_PAGES} published under:"
 echo "  ${CONTENT_DIR}"
 echo "============================================================"
